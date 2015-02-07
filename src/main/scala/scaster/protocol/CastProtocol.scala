@@ -2,39 +2,56 @@ package scaster.protocol
 
 import java.io.{DataOutputStream, DataInputStream}
 import com.trueaccord.scalapb.GeneratedMessage
-import com.typesafe.scalalogging.Logger
 import extensions.api.cast_channel.cast_channel.CastMessage
 import extensions.api.cast_channel.cast_channel.CastMessage.PayloadType
-import org.slf4j.LoggerFactory
 import scaster.Device
-import scaster.protocol.CastPayloads.CastPayload
+import scaster.protocol.CastPayloads.{GetStatusPayload, GenericPayload, CastPayload}
+import scaster.utils.{Log, NativesHelper}
 
 class CastProtocol(device: Device)  {
-  val logger = Logger(LoggerFactory.getLogger("scaster"))
-
   var sock = WeakSSLSocket.connect(device.address, device.port)
-  private var ips = sock.getInputStream
-  private var ops = sock.getOutputStream
+  private val ips = sock.getInputStream
+  private val ops = sock.getOutputStream
 
   def sendPacket(message: GeneratedMessage): Unit = {
-    logger.debug(s"<= $message")
+    Log.shared.debug(s"<= $message")
     val writer = new DataOutputStream(ops)
     NativesHelper.writeUInt32(message.serializedSize.asInstanceOf[Long], writer)
     message.writeTo(ops)
     ops.flush()
   }
 
-  def readPacket(): Option[CastMessage] = {
+  def sendPing(): Unit = {
+    val msg = CastMessageBuilder.buildCastMessage(CastNamespaces.HEARTBEAT, GenericPayload("PING"))
+    sendPacket(msg)
+  }
+
+  def sendPong(): Unit = {
+    val msg = CastMessageBuilder.buildCastMessage(CastNamespaces.HEARTBEAT, GenericPayload("PONG"))
+    sendPacket(msg)
+  }
+
+  def sendConnect(): Unit = {
+    val msg = CastMessageBuilder.buildCastMessage(CastNamespaces.CONNECTION, GenericPayload("CONNECT"))
+    sendPacket(msg)
+  }
+
+  def sendGetStatus(requestId: Int): Unit = {
+    val msg = CastMessageBuilder.buildCastMessage(CastNamespaces.RECEIVER, GetStatusPayload("GET_STATUS", requestId))
+    sendPacket(msg)
+  }
+
+  def tryReadPacket(): Option[CastMessage] = {
     try {
       val reader = new DataInputStream(ips)
       val headerLen = reader.readInt()
-      logger.debug(s"Received header length: $headerLen")
+      Log.shared.debug(s"Received header length: $headerLen")
       val packet = Array.fill(headerLen) {
         Byte.MinValue
       }
       reader.readFully(packet)
       val message = CastMessage.parseFrom(packet)
-      logger.debug(s"=> $message")
+      Log.shared.debug(s"=> $message")
       Some(message)
     } catch {
       case e:java.io.EOFException => None

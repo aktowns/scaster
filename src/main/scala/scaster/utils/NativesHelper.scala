@@ -1,4 +1,4 @@
-package scaster.protocol
+package scaster.utils
 
 import java.io.DataOutputStream
 

@@ -20,7 +20,7 @@ object ServiceTypeListenerFactory {
               logger.info("Found chromecast servicetype")
               jmdns.addServiceListener(typ, new ServiceListener {
                 override def serviceAdded(event: ServiceEvent): Unit = {
-                  logger.info(s"requesting resolution for ${event.getInfo.getQualifiedName}")
+                  logger.info(s"Requesting resolution for ${event.getInfo.getQualifiedName}")
                   jmdns.requestServiceInfo(typ, event.getName)
                 }
 

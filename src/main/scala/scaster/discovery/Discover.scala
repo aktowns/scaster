@@ -2,16 +2,13 @@ package scaster.discovery
 
 import java.net.InetAddress
 import javax.jmdns._
-
-import com.typesafe.scalalogging.Logger
-import org.slf4j.LoggerFactory
 import scaster.Device
+import scaster.utils.Log
 
 import scala.concurrent.Promise
 
 object Discover {
   private val jmdns = JmDNS.create(InetAddress.getLocalHost)
-  val logger = Logger(LoggerFactory.getLogger("scaster"))
 
   def service(maybeName: Option[String]): Promise[Device] = {
     val device = Promise[Device]()
@@ -19,15 +16,17 @@ object Discover {
     val listener = ServiceTypeListenerFactory.makeServiceTypeListener(jmdns, (event: ServiceEvent) => {
       val name = maybeName.getOrElse(event.getName)
       if (name.equals(event.getName)) {
-        device.success(new Device(event.getName, event.getInfo.getAddress, event.getInfo.getPort))
+        val foundDevice = new Device(event.getName, event.getInfo.getInetAddresses.head, event.getInfo.getPort)
+        Log.shared.info(s"Found: ${foundDevice.name} at ${foundDevice.address}")
+        device.success(foundDevice)
       } else {
-        logger.debug(s"Ignoring ${event.getName}")
+        Log.shared.debug(s"Ignoring ${event.getName}")
       }
     }, (event: ServiceEvent) => {
-      logger.info(s"serviceRemoved $event")
+      Log.shared.info(s"serviceRemoved $event")
     })
 
-    logger.info("Beginning mDNS discovery..")
+    Log.shared.info("Beginning mDNS discovery..")
 
     jmdns.addServiceTypeListener(listener)
     jmdns.requestServiceInfo("_googlecast._tcp.local", "")
