@@ -8,8 +8,8 @@ My attempt at learning a bit of scala.
 def handlePayload(prot: Protocol, payload: CastPayload): Unit = {
   payload match {
     case Payload(typ) if typ == CastPayloadType.PING => prot.sendPong()
-    case StatusPayload(typ, id, status) => Log.shared.info($status)
-    case _ => Log.shared.info("Ignoring payload..")
+    case StatusPayload(typ, id, status) => println($status)
+    case _ => println("Ignoring payload..")
   }
 }
 
@@ -18,7 +18,7 @@ def readPacketIn(prot: Protocol): Unit = {
     case Some(message) =>
       message.tryReadPayload() match {
         case Some(payload) => handlePayload(prot, payload)
-        case None => Log.shared.info("binary payload data returned.")
+        case None => println("binary payload data returned.")
       }
     case None => Thread.sleep(4000)
   }
@@ -30,14 +30,14 @@ def main(args: Array[String]) {
     case Success(device: Device) =>
       val protocol = new Protocol(device)
 
-      Log.shared.info("Saying hello")
+      println("Saying hello")
       protocol.sendConnect()
       protocol.sendGetStatus(1337)
 
       while(protocol.isConnected) {
         readPacketIn(protocol)
       }
-    case _ => Log.shared.error("Failed to find any devices.")
+    case _ => println("Failed to find any devices.")
   }
 }
 ```
