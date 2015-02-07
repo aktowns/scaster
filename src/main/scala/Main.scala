@@ -6,6 +6,7 @@ import scaster.discovery.Discover
 import scaster.protocol.CastPayloadParser.CastPayloadType
 import scaster.protocol.CastPayloads.{CastPayload, GenericPayload, StatusPayload}
 import scaster.protocol._
+import scaster.protocol.CastMessageImplicits._
 
 object Main {
   def handlePayload(prot: CastProtocol, payload: CastPayload): Unit = {
@@ -19,7 +20,7 @@ object Main {
   def readPacketIn(prot: CastProtocol): Unit = {
     prot.tryReadPacket() match {
       case Some(message) =>
-        CastProtocol.tryReadPayload(message) match {
+        message.tryReadPayload() match {
           case Some(payload) => handlePayload(prot, payload)
           case None => Log.shared.info("binary payload data returned.")
         }

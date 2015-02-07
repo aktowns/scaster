@@ -3,7 +3,6 @@ package scaster.protocol
 import java.io.{DataOutputStream, DataInputStream}
 import com.trueaccord.scalapb.GeneratedMessage
 import extensions.api.cast_channel.cast_channel.CastMessage
-import extensions.api.cast_channel.cast_channel.CastMessage.PayloadType
 import scaster.Device
 import scaster.protocol.CastPayloads.{GetStatusPayload, GenericPayload, CastPayload}
 import scaster.utils.{Log, NativesHelper}
@@ -22,22 +21,22 @@ class CastProtocol(device: Device)  {
   }
 
   def sendPing(): Unit = {
-    val msg = CastMessageBuilder.buildCastMessage(CastNamespaces.HEARTBEAT, GenericPayload("PING"))
+    val msg = CastMessageBuilder.build(CastNamespaces.HEARTBEAT, GenericPayload("PING"))
     sendPacket(msg)
   }
 
   def sendPong(): Unit = {
-    val msg = CastMessageBuilder.buildCastMessage(CastNamespaces.HEARTBEAT, GenericPayload("PONG"))
+    val msg = CastMessageBuilder.build(CastNamespaces.HEARTBEAT, GenericPayload("PONG"))
     sendPacket(msg)
   }
 
   def sendConnect(): Unit = {
-    val msg = CastMessageBuilder.buildCastMessage(CastNamespaces.CONNECTION, GenericPayload("CONNECT"))
+    val msg = CastMessageBuilder.build(CastNamespaces.CONNECTION, GenericPayload("CONNECT"))
     sendPacket(msg)
   }
 
   def sendGetStatus(requestId: Int): Unit = {
-    val msg = CastMessageBuilder.buildCastMessage(CastNamespaces.RECEIVER, GetStatusPayload("GET_STATUS", requestId))
+    val msg = CastMessageBuilder.build(CastNamespaces.RECEIVER, GetStatusPayload("GET_STATUS", requestId))
     sendPacket(msg)
   }
 
@@ -59,15 +58,4 @@ class CastProtocol(device: Device)  {
   }
 
   def isConnected: Boolean = sock.isConnected
-}
-
-object CastProtocol {
-  def tryReadPayload(pack: CastMessage): Option[CastPayload] = {
-    if (pack.payloadType == PayloadType.STRING) {
-      val str = pack.getPayloadUtf8
-      Some(CastPayloadParser.parseUTF8(str))
-    } else {
-      None
-    }
-  }
 }
