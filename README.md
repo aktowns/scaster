@@ -5,6 +5,15 @@ Basic wrapper around the chromecast protocol.
 My attempt at learning a bit of scala.
 
 ```scala
+import scala.util.Success
+import scala.concurrent.ExecutionContext.Implicits.global
+import scaster._
+import scaster.discovery.Discover
+import scaster.protocol.PayloadParser.CastPayloadType
+import scaster.protocol.Payloads.{CastPayload, Payload, StatusPayload}
+import scaster.protocol._
+import scaster.protocol.MessageImplicits._
+
 def handlePayload(prot: Protocol, payload: CastPayload): Unit = {
   payload match {
     case Payload(typ) if typ == CastPayloadType.PING => prot.sendPong()
@@ -32,6 +41,7 @@ def main(args: Array[String]) {
 
       println("Saying hello")
       protocol.sendConnect()
+
       protocol.sendGetStatus(1337)
 
       while(protocol.isConnected) {
