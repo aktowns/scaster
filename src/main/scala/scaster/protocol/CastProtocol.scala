@@ -26,7 +26,6 @@ class CastProtocol(device: Device)  {
 
   def readPacket(): Option[CastMessage] = {
     try {
-      logger.debug("Attempting to read a packet")
       val reader = new DataInputStream(ips)
       val headerLen = reader.readInt()
       logger.debug(s"Received header length: $headerLen")
@@ -38,9 +37,7 @@ class CastProtocol(device: Device)  {
       logger.debug(s"=> $message")
       Some(message)
     } catch {
-      case e:java.io.EOFException =>
-        logger.warn("EOF on packet read")
-        None
+      case e:java.io.EOFException => None
     }
   }
 

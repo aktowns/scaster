@@ -17,5 +17,3 @@ libraryDependencies ++= Seq(
 )
 
 PB.protobufSettings
-
-wartremoverWarnings ++= Warts.all

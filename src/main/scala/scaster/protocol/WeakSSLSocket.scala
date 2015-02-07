@@ -7,7 +7,7 @@ import javax.net.ssl._
 
 object WeakSSLSocket {
   private val trustAllCerts = Array(new X509TrustManager {
-    override def getAcceptedIssuers: Array[X509Certificate] = null
+    override def getAcceptedIssuers: Array[X509Certificate] = Array.empty[X509Certificate]
     override def checkClientTrusted(x509Certificates: Array[X509Certificate], s: String): Unit = Unit
     override def checkServerTrusted(x509Certificates: Array[X509Certificate], s: String): Unit = Unit
   }).asInstanceOf[Array[TrustManager]]
