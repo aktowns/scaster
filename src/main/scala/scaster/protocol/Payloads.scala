@@ -1,9 +1,9 @@
 package scaster.protocol
 
-object CastPayloads {
+object Payloads {
   sealed trait CastPayload
 
-  case class GenericPayload(`type`: String) extends CastPayload
+  case class Payload(`type`: String) extends CastPayload
 
   case class GetStatusPayload(`type`: String, requestId: Int) extends CastPayload
 

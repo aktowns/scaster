@@ -1,23 +1,23 @@
-import scaster.utils.Log
 import scala.util.Success
 import scala.concurrent.ExecutionContext.Implicits.global
 import scaster._
 import scaster.discovery.Discover
-import scaster.protocol.CastPayloadParser.CastPayloadType
-import scaster.protocol.CastPayloads.{CastPayload, GenericPayload, StatusPayload}
+import scaster.protocol.PayloadParser.CastPayloadType
+import scaster.protocol.Payloads.{CastPayload, Payload, StatusPayload}
 import scaster.protocol._
-import scaster.protocol.CastMessageImplicits._
+import scaster.protocol.MessageImplicits._
+import scaster.utils.Log
 
 object Main {
-  def handlePayload(prot: CastProtocol, payload: CastPayload): Unit = {
+  def handlePayload(prot: Protocol, payload: CastPayload): Unit = {
     payload match {
-      case GenericPayload(typ) if typ == CastPayloadType.PING => prot.sendPong()
+      case Payload(typ) if typ == CastPayloadType.PING => prot.sendPong()
       case StatusPayload(typ, id, status) => Log.shared.info(s"Chromecast($id): $status")
       case _ => Log.shared.info("Ignoring payload..")
     }
   }
 
-  def readPacketIn(prot: CastProtocol): Unit = {
+  def readPacketIn(prot: Protocol): Unit = {
     prot.tryReadPacket() match {
       case Some(message) =>
         message.tryReadPayload() match {
@@ -32,7 +32,7 @@ object Main {
     val device = Discover.service(None)
     device.future.onComplete {
       case Success(device: Device) =>
-        val protocol = new CastProtocol(device)
+        val protocol = new Protocol(device)
 
         Log.shared.info("Saying hello")
         protocol.sendConnect()

@@ -1,6 +1,6 @@
 package scaster.protocol
 
-object CastNamespaces {
+object Namespaces {
   val HEARTBEAT  = "urn:x-cast:com.google.cast.tp.heartbeat"
   val CONNECTION = "urn:x-cast:com.google.cast.tp.connection"
   val DEVICEAUTH = "urn:x-cast:com.google.cast.tp.deviceauth"

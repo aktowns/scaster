@@ -4,10 +4,10 @@ import java.io.{DataOutputStream, DataInputStream}
 import com.trueaccord.scalapb.GeneratedMessage
 import extensions.api.cast_channel.cast_channel.CastMessage
 import scaster.Device
-import scaster.protocol.CastPayloads.{GetStatusPayload, GenericPayload, CastPayload}
+import scaster.protocol.Payloads.{Payload, GetStatusPayload}
 import scaster.utils.{Log, NativesHelper}
 
-class CastProtocol(device: Device)  {
+class Protocol(device: Device)  {
   var sock = WeakSSLSocket.connect(device.address, device.port)
   private val ips = sock.getInputStream
   private val ops = sock.getOutputStream
@@ -21,22 +21,22 @@ class CastProtocol(device: Device)  {
   }
 
   def sendPing(): Unit = {
-    val msg = CastMessageBuilder.build(CastNamespaces.HEARTBEAT, GenericPayload("PING"))
+    val msg = MessageBuilder.build(Namespaces.HEARTBEAT, Payload("PING"))
     sendPacket(msg)
   }
 
   def sendPong(): Unit = {
-    val msg = CastMessageBuilder.build(CastNamespaces.HEARTBEAT, GenericPayload("PONG"))
+    val msg = MessageBuilder.build(Namespaces.HEARTBEAT, Payload("PONG"))
     sendPacket(msg)
   }
 
   def sendConnect(): Unit = {
-    val msg = CastMessageBuilder.build(CastNamespaces.CONNECTION, GenericPayload("CONNECT"))
+    val msg = MessageBuilder.build(Namespaces.CONNECTION, Payload("CONNECT"))
     sendPacket(msg)
   }
 
   def sendGetStatus(requestId: Int): Unit = {
-    val msg = CastMessageBuilder.build(CastNamespaces.RECEIVER, GetStatusPayload("GET_STATUS", requestId))
+    val msg = MessageBuilder.build(Namespaces.RECEIVER, GetStatusPayload("GET_STATUS", requestId))
     sendPacket(msg)
   }
 

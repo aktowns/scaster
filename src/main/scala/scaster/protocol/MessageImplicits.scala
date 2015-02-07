@@ -2,14 +2,14 @@ package scaster.protocol
 
 import extensions.api.cast_channel.cast_channel.CastMessage
 import extensions.api.cast_channel.cast_channel.CastMessage.PayloadType
-import scaster.protocol.CastPayloads.CastPayload
+import scaster.protocol.Payloads.CastPayload
 
-object CastMessageImplicits {
+object MessageImplicits {
   class CastMessageAdditions(val x: CastMessage) {
     def tryReadPayload(): Option[CastPayload] = {
       if (x.payloadType == PayloadType.STRING) {
         val str = x.getPayloadUtf8
-        Some(CastPayloadParser.parseUTF8(str))
+        Some(PayloadParser.parseUTF8(str))
       } else {
         None
       }

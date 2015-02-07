@@ -1,9 +1,9 @@
 package scaster.protocol
 
 import net.liftweb.json._
-import scaster.protocol.CastPayloads.{LaunchPayload, StatusPayload, GenericPayload, CastPayload}
+import scaster.protocol.Payloads.{Payload, LaunchPayload, StatusPayload, CastPayload}
 
-object CastPayloadParser {
+object PayloadParser {
   object CastPayloadType {
     val PING = "PING"
     val PONG = "PONG"
@@ -16,7 +16,7 @@ object CastPayloadParser {
 
   def parseUTF8(str: String): CastPayload = {
     val json = parse(str)
-    val generic = json.extract[GenericPayload]
+    val generic = json.extract[Payload]
     generic.`type` match {
       case CastPayloadType.STATUS => json.extract[StatusPayload]
       case CastPayloadType.LAUNCH => json.extract[LaunchPayload]
