@@ -8,7 +8,7 @@ My attempt at learning a bit of scala.
 def handlePayload(prot: Protocol, payload: CastPayload): Unit = {
   payload match {
     case Payload(typ) if typ == CastPayloadType.PING => prot.sendPong()
-    case StatusPayload(typ, id, status) => Log.shared.info(s"Chromecast($id): $status")
+    case StatusPayload(typ, id, status) => Log.shared.info($status)
     case _ => Log.shared.info("Ignoring payload..")
   }
 }
