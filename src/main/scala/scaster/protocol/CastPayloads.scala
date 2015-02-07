@@ -16,7 +16,7 @@ object CastPayloads {
   case class StatusApplication(appId: String, displayName: String, namespaces: Array[StatusNamespace],
                                sessionId: String, statusText: String, transportId: String)
 
-  case class Status(applications: Array[StatusApplication], isActiveInput: Boolean, volume: StatusVolume)
+  case class Status(applications: Array[StatusApplication], isActiveInput: Option[Boolean], volume: StatusVolume)
 
   case class StatusPayload(`type`: String, requestId: Int, status: Status) extends CastPayload
 
